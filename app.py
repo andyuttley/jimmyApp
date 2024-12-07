@@ -185,23 +185,23 @@ with st.expander("🍀 What's LUCK got to do with it? 🍀", expanded=False):
     st.dataframe(agg[['Player','Luck Points','Table Points','Player_Score','Actual Pos','Luck Adjusted Pos','Difference']])
 
     # Player GW Rank Matrix Section
-    with st.expander(":bar_chart: Player GW Rank Matrix :bar_chart:", expanded=False):
-        st.subheader("Player GW Rank Matrix")
-        st.write("Matrix of the count each time each player has finished in that rank for the gameweek")
     
-        # Create the matrix: rows are players, columns are GW ranks, values are counts
-        rank_matrix = df.pivot_table(
-            index='Player', 
-            columns='GW Rank', 
-            aggfunc='size', 
-            fill_value=0
-        )
-    
-        # Rename columns for clarity (e.g., 1 -> 1st, 2 -> 2nd, etc.)
-        rank_matrix.columns = [f"{int(col)}{('th' if 4 <= col <= 20 else {1:'st',2:'nd',3:'rd'}.get(col % 10, 'th'))}" for col in rank_matrix.columns]
-    
-        # Show the matrix
-        st.dataframe(rank_matrix, use_container_width=True)
+    st.subheader("Player GW Rank Matrix")
+    st.write("Matrix of the count each time each player has finished in that rank for the gameweek")
+
+    # Create the matrix: rows are players, columns are GW ranks, values are counts
+    rank_matrix = df.pivot_table(
+        index='Player', 
+        columns='GW Rank', 
+        aggfunc='size', 
+        fill_value=0
+    )
+
+    # Rename columns for clarity (e.g., 1 -> 1st, 2 -> 2nd, etc.)
+    rank_matrix.columns = [f"{int(col)}{('th' if 4 <= col <= 20 else {1:'st',2:'nd',3:'rd'}.get(col % 10, 'th'))}" for col in rank_matrix.columns]
+
+    # Show the matrix
+    st.dataframe(rank_matrix, use_container_width=True)
 
 
 ###############
