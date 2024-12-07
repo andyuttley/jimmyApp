@@ -8,11 +8,12 @@ import os
 st.header("Jimmy Bullard League Stats & Analysis")
 
 # Load data
-df = pd.read_csv('/Users/andrewuttley/final_df.csv')
-granular_results = pd.read_csv('/Users/andrewuttley/granular_results.csv')
-finishing_positions = pd.read_csv('/Users/andrewuttley/finishing_positions.csv')
-top_4_odds = pd.read_csv('/Users/andrewuttley/top_4_odds.csv')
-score_distributions = pd.read_pickle("/Users/andrewuttley/score_distributions.pkl")
+df = pd.read_csv('final_df.csv')
+granular_results = pd.read_csv('granular_results.csv')
+finishing_positions = pd.read_csv('finishing_positions.csv')
+top_4_odds = pd.read_csv('top_4_odds.csv')
+score_distributions = pd.read_pickle('score_distributions.pkl')
+
 
 max_gameweek = df['Gameweek'].max()  # Find the maximum Gameweek number
 
