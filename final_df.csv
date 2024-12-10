@@ -139,3 +139,13 @@ Mike,John,27,18,Win,3,14,9.0,0
 John,Mike,18,27,Lose,0,14,10.0,0
 Andy,Mikey,48,36,Win,3,14,3.0,3
 Mikey,Andy,36,48,Lose,0,14,7.0,0
+Nick,Tim,38,48,Lose,0,15,5.0,1
+Tim,Nick,48,38,Win,3,15,1.0,3
+Matt,Karl,47,47,Draw,1,15,2.0,3
+Karl,Matt,47,47,Draw,1,15,2.0,3
+Sam,John,22,37,Lose,0,15,10.0,0
+John,Sam,37,22,Win,3,15,6.0,1
+Dove,Mikey,29,29,Draw,1,15,8.0,0
+Mikey,Dove,29,29,Draw,1,15,8.0,0
+Mike,Andy,39,35,Win,3,15,4.0,3
+Andy,Mike,35,39,Lose,0,15,7.0,0
