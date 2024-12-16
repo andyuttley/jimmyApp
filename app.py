@@ -17,7 +17,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.header("Jimmy Bullarzd - ManeBall Analysis")
+st.header("Jimmy Bullard - ManeBall Analysis")
 
 # Load data
 df = pd.read_csv('final_df.csv')
@@ -56,7 +56,7 @@ with st.expander(":soccer: Gameweek Previews :soccer:", expanded=False):
     st.subheader("Gameweek Previews")
 
     # Load upcoming fixtures
-gameweek_fixtures = pd.read_csv('gameweek_fixtures.csv')
+    gameweek_fixtures = pd.read_csv('gameweek_fixtures.csv')
 
     # Calculate probabilities for each match based on player performance
     def calculate_probabilities(player1, player2):
