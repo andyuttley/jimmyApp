@@ -58,52 +58,69 @@ with st.expander(":soccer: Gameweek Previews :soccer:", expanded=False):
     # Load upcoming fixtures
     gameweek_fixtures = pd.read_csv('fixtures.csv')
 
-    # Rename columns to match expected names
-    gameweek_fixtures.rename(columns={'player': 'Player1', 'opponent': 'Player2'}, inplace=True)
+    # Debugging: Display column names
+    st.write("Columns in fixtures file:", gameweek_fixtures.columns)
 
-    # Calculate probabilities for each match based on player performance
-    def calculate_probabilities(player1, player2):
-        player1_scores = score_distributions[player1]
-        player2_scores = score_distributions[player2]
+    # Rename columns to match expected names, if necessary
+    if 'player' in gameweek_fixtures.columns and 'opponent' in gameweek_fixtures.columns:
+        gameweek_fixtures.rename(columns={'player': 'Player1', 'opponent': 'Player2'}, inplace=True)
 
-        total_simulations = 10000
-        player1_wins = 0
-        player2_wins = 0
-        draws = 0
+    # Check if required columns are present
+    if 'Player1' not in gameweek_fixtures.columns or 'Player2' not in gameweek_fixtures.columns:
+        st.error("The fixtures file must have columns named 'Player1' and 'Player2'. Please check the file format.")
+    else:
+        # Calculate probabilities for each match based on player performance
+        def calculate_probabilities(player1, player2):
+            if player1 not in score_distributions or player2 not in score_distributions:
+                return {
+                    'Player1': player1,
+                    'Player2': player2,
+                    'Player1 Win %': None,
+                    'Player2 Win %': None,
+                    'Draw %': None,
+                }
 
-        for _ in range(total_simulations):
-            score1 = np.random.choice(player1_scores)
-            score2 = np.random.choice(player2_scores)
+            player1_scores = score_distributions[player1]
+            player2_scores = score_distributions[player2]
 
-            if score1 > score2:
-                player1_wins += 1
-            elif score2 > score1:
-                player2_wins += 1
-            else:
-                draws += 1
+            total_simulations = 10000
+            player1_wins = 0
+            player2_wins = 0
+            draws = 0
 
-        total = player1_wins + player2_wins + draws
-        return {
-            'Player1': player1,
-            'Player2': player2,
-            'Player1 Win %': round(100 * player1_wins / total, 1),
-            'Player2 Win %': round(100 * player2_wins / total, 1),
-            'Draw %': round(100 * draws / total, 1)
-        }
+            for _ in range(total_simulations):
+                score1 = np.random.choice(player1_scores)
+                score2 = np.random.choice(player2_scores)
 
-    # Generate match predictions
-    predictions = []
-    for _, row in gameweek_fixtures.iterrows():
-        predictions.append(calculate_probabilities(row['Player1'], row['Player2']))
+                if score1 > score2:
+                    player1_wins += 1
+                elif score2 > score1:
+                    player2_wins += 1
+                else:
+                    draws += 1
 
-    predictions_df = pd.DataFrame(predictions)
+            total = player1_wins + player2_wins + draws
+            return {
+                'Player1': player1,
+                'Player2': player2,
+                'Player1 Win %': round(100 * player1_wins / total, 1),
+                'Player2 Win %': round(100 * player2_wins / total, 1),
+                'Draw %': round(100 * draws / total, 1)
+            }
 
-    # Display the predictions
-    st.write("Predicted Chances for Upcoming Matches:")
-    st.dataframe(predictions_df)
+        # Generate match predictions
+        predictions = []
+        for _, row in gameweek_fixtures.iterrows():
+            predictions.append(calculate_probabilities(row['Player1'], row['Player2']))
 
-    # Highlight key matchups
-    st.write("## Key Matchups to Watch")
-    top_matchups = predictions_df.sort_values(by='Draw %', ascending=False).head(3)
-    for _, matchup in top_matchups.iterrows():
-        st.write(f"- **{matchup['Player1']} vs {matchup['Player2']}**: {matchup['Draw %']}% chance of a draw, {matchup['Player1 Win %']}% chance {matchup['Player1']} wins, {matchup['Player2 Win %']}% chance {matchup['Player2']} wins.")
+        predictions_df = pd.DataFrame(predictions)
+
+        # Display the predictions
+        st.write("Predicted Chances for Upcoming Matches:")
+        st.dataframe(predictions_df)
+
+        # Highlight key matchups
+        st.write("## Key Matchups to Watch")
+        top_matchups = predictions_df.sort_values(by='Draw %', ascending=False).head(3)
+        for _, matchup in top_matchups.iterrows():
+            st.write(f"- **{matchup['Player1']} vs {matchup['Player2']}**: {matchup['Draw %']}% chance of a draw, {matchup['Player1 Win %']}% chance {matchup['Player1']} wins, {matchup['Player2 Win %']}% chance {matchup['Player2']} wins.")
