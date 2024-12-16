@@ -17,7 +17,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.header("Jimmy Bullard - ManeBall Analysis")
+st.header("Jimmy Bullardz - ManeBall Analysis")
 
 # Load data
 df = pd.read_csv('final_df.csv')
