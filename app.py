@@ -56,7 +56,7 @@ with st.expander(":soccer: Gameweek Previews :soccer:", expanded=False):
     st.subheader("Gameweek Previews")
 
     # Load upcoming fixtures
-    gameweek_fixtures = pd.read_csv('gameweek_fixtures.csv')
+    gameweek_fixtures = pd.read_csv('fixtures.csv')
 
     # Calculate probabilities for each match based on player performance
     def calculate_probabilities(player1, player2):
