@@ -80,18 +80,22 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
 
     # Function to calculate probabilities with improved variance
     def calculate_probabilities_normal(player, opponent, score_distributions):
-        # Use mean and std for normal distribution sampling
+        # Use mean and std for normal distribution
         player_mean, player_std = np.mean(score_distributions[player]), np.std(score_distributions[player])
         opponent_mean, opponent_std = np.mean(score_distributions[opponent]), np.std(score_distributions[opponent])
-
-        player_scores = np.random.normal(player_mean, player_std, 1000)
-        opponent_scores = np.random.normal(opponent_mean, opponent_std, 1000)
-
+    
+        # Generate a shared set of scores for symmetry
+        samples = 1000
+        player_scores = np.random.normal(player_mean, player_std, samples)
+        opponent_scores = np.random.normal(opponent_mean, opponent_std, samples)
+    
+        # Compare player and opponent scores
         win_pct = (player_scores > opponent_scores).mean() * 100
-        draw_pct = (abs(player_scores - opponent_scores) < 1).mean() * 100  # Close enough to be a draw
+        draw_pct = (abs(player_scores - opponent_scores) < 1).mean() * 100  # Small difference = draw
         lose_pct = (player_scores < opponent_scores).mean() * 100
-
+    
         return round(win_pct, 1), round(draw_pct, 1), round(lose_pct, 1)
+
 
     # Calculate results for deduplicated fixtures
     results = []
