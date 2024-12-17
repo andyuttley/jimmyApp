@@ -149,3 +149,13 @@ Dove,Mikey,29,29,Draw,1,15,8.0,0
 Mikey,Dove,29,29,Draw,1,15,8.0,0
 Mike,Andy,39,35,Win,3,15,4.0,3
 Andy,Mike,35,39,Lose,0,15,7.0,0
+Nick,Karl,50,29,Win,3,16,3.0,3
+Karl,Nick,29,50,Lose,0,16,8.0,0
+Tim,John,52,37,Win,3,16,2.0,3
+John,Tim,37,52,Lose,0,16,7.0,0
+Matt,Mikey,38,38,Draw,1,16,5.0,1
+Mikey,Matt,38,38,Draw,1,16,5.0,1
+Sam,Andy,25,39,Lose,0,16,9.0,0
+Andy,Sam,39,25,Win,3,16,4.0,3
+Dove,Mike,53,19,Win,3,16,1.0,3
+Mike,Dove,19,53,Lose,0,16,10.0,0
