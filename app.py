@@ -85,25 +85,26 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
     
     deduped_fixtures_df = pd.DataFrame(deduped_fixtures)
 
+    # Function to calculate probabilities with improved accuracy
+    def calculate_probabilities(player, opponent, score_distributions):
+        samples = 1000  # Increased sample size for better accuracy
 
-    # Function to calculate probabilities with improved variance
-    def calculate_probabilities_normal(player, opponent, score_distributions):
-        # Use mean and std for normal distribution
-        player_mean, player_std = np.mean(score_distributions[player]), np.std(score_distributions[player])
-        opponent_mean, opponent_std = np.mean(score_distributions[opponent]), np.std(score_distributions[opponent])
-    
-        # Generate a shared set of scores for symmetry
-        samples = 1000
-        player_scores = np.random.normal(player_mean, player_std, samples)
-        opponent_scores = np.random.normal(opponent_mean, opponent_std, samples)
-    
-        # Compare player and opponent scores
+        # Generate samples using existing score bags
+        player_scores = np.random.choice(score_distributions[player], samples)
+        opponent_scores = np.random.choice(score_distributions[opponent], samples)
+
+        # Calculate win, draw, lose probabilities
         win_pct = (player_scores > opponent_scores).mean() * 100
-        draw_pct = (abs(player_scores - opponent_scores) < 1).mean() * 100  # Small difference = draw
+        draw_pct = (abs(player_scores - opponent_scores) < 0.1).mean() * 100  # Very small difference = draw
         lose_pct = (player_scores < opponent_scores).mean() * 100
-    
-        return round(win_pct, 1), round(draw_pct, 1), round(lose_pct, 1)
 
+        # Adjust for floating-point precision to ensure total = 100%
+        total = win_pct + draw_pct + lose_pct
+        win_pct = round((win_pct / total) * 100, 1)
+        draw_pct = round((draw_pct / total) * 100, 1)
+        lose_pct = round((lose_pct / total) * 100, 1)
+
+        return win_pct, draw_pct, lose_pct
 
     # Calculate results for deduplicated fixtures
     results = []
@@ -113,7 +114,7 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
         opponent = row['Opponent']
 
         if player in score_distributions and opponent in score_distributions:
-            win, draw, lose = calculate_probabilities_normal(player, opponent, score_distributions)
+            win, draw, lose = calculate_probabilities(player, opponent, score_distributions)
             gap = abs(win - lose)
             results.append([player, opponent, f"{win}%", f"{draw}%", f"{lose}%", gap])
         else:
@@ -126,7 +127,6 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
     # Display table
     st.write("Predicted Win/Draw/Loss Probabilities (Ranked by Confidence):")
     st.dataframe(results_df.drop(columns=["Gap"]), use_container_width=True)
-
 
 
 
