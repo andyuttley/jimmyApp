@@ -51,6 +51,56 @@ with st.expander(":trophy: Current Table :trophy:", expanded=False):
     st.write("Aggregated Stats:")
     st.dataframe(aggregated_table)
 
+# Load fixtures file dynamically
+fixtures_file = 'fixtures.csv'
+if os.path.exists(fixtures_file):
+    fixtures = pd.read_csv(fixtures_file)
+else:
+    st.error(f"File '{fixtures_file}' not found. Please upload it.")
+    st.stop()
+
+# Get the minimum gameweek
+min_gameweek = fixtures['Gameweek'].min()
+
+###############
+# PREVIEW GAMEWEEK X
+###############
+with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=True):
+    st.subheader(f"Fixtures for Gameweek {min_gameweek}")
+
+    # Filter fixtures for the minimum gameweek
+    gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
+
+    # Function to calculate probabilities
+    def calculate_probabilities(player, opponent, score_distributions):
+        player_scores = np.random.choice(score_distributions[player], 100)
+        opponent_scores = np.random.choice(score_distributions[opponent], 100)
+
+        win_pct = (player_scores > opponent_scores).mean() * 100
+        draw_pct = (player_scores == opponent_scores).mean() * 100
+        lose_pct = (player_scores < opponent_scores).mean() * 100
+
+        return round(win_pct, 1), round(draw_pct, 1), round(lose_pct, 1)
+
+    # Table to display results
+    results = []
+
+    for _, row in gw_fixtures.iterrows():
+        player = row['Player']
+        opponent = row['Opponent']
+
+        if player in score_distributions and opponent in score_distributions:
+            win, draw, lose = calculate_probabilities(player, opponent, score_distributions)
+            results.append([player, opponent, f"{win}%", f"{draw}%", f"{lose}%"])
+        else:
+            results.append([player, opponent, "N/A", "N/A", "N/A"])
+
+    results_df = pd.DataFrame(results, columns=["Player", "Opponent", "Win %", "Draw %", "Lose %"])
+    st.dataframe(results_df, use_container_width=True)
+
+
+
+
 ##############################
 # 1000 SIMULATED SEASON ENDS
 ##############################
