@@ -51,6 +51,10 @@ with st.expander(":trophy: Current Table :trophy:", expanded=False):
     st.write("Aggregated Stats:")
     st.dataframe(aggregated_table)
 
+##############################
+# PREVIEW GAMEWEEK
+##############################
+
 # Load fixtures file dynamically
 fixtures_file = 'fixtures.csv'
 if os.path.exists(fixtures_file):
@@ -69,14 +73,18 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
     # Deduplicate reverse fixtures
     seen_fixtures = set()
     deduped_fixtures = []
-
+    
+    # Filter for the minimum gameweek
+    gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
+    
     for _, row in gw_fixtures.iterrows():
         fixture = tuple(sorted([row['Player'], row['Opponent']]))
         if fixture not in seen_fixtures:
             seen_fixtures.add(fixture)
             deduped_fixtures.append(row)
-
+    
     deduped_fixtures_df = pd.DataFrame(deduped_fixtures)
+
 
     # Function to calculate probabilities with improved variance
     def calculate_probabilities_normal(player, opponent, score_distributions):
