@@ -67,7 +67,7 @@ else:
 min_gameweek = fixtures['Gameweek'].min()
 
 # PREVIEW GAMEWEEK X
-with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=True):
+with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=False):
     st.subheader(f"Fixtures for Gameweek {min_gameweek}")
 
     # Deduplicate reverse fixtures
