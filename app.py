@@ -62,41 +62,58 @@ else:
 # Get the minimum gameweek
 min_gameweek = fixtures['Gameweek'].min()
 
-###############
 # PREVIEW GAMEWEEK X
-###############
 with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=True):
     st.subheader(f"Fixtures for Gameweek {min_gameweek}")
 
-    # Filter fixtures for the minimum gameweek
-    gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
+    # Deduplicate reverse fixtures
+    seen_fixtures = set()
+    deduped_fixtures = []
 
-    # Function to calculate probabilities
-    def calculate_probabilities(player, opponent, score_distributions):
-        player_scores = np.random.choice(score_distributions[player], 100)
-        opponent_scores = np.random.choice(score_distributions[opponent], 100)
+    for _, row in gw_fixtures.iterrows():
+        fixture = tuple(sorted([row['Player'], row['Opponent']]))
+        if fixture not in seen_fixtures:
+            seen_fixtures.add(fixture)
+            deduped_fixtures.append(row)
+
+    deduped_fixtures_df = pd.DataFrame(deduped_fixtures)
+
+    # Function to calculate probabilities with improved variance
+    def calculate_probabilities_normal(player, opponent, score_distributions):
+        # Use mean and std for normal distribution sampling
+        player_mean, player_std = np.mean(score_distributions[player]), np.std(score_distributions[player])
+        opponent_mean, opponent_std = np.mean(score_distributions[opponent]), np.std(score_distributions[opponent])
+
+        player_scores = np.random.normal(player_mean, player_std, 1000)
+        opponent_scores = np.random.normal(opponent_mean, opponent_std, 1000)
 
         win_pct = (player_scores > opponent_scores).mean() * 100
-        draw_pct = (player_scores == opponent_scores).mean() * 100
+        draw_pct = (abs(player_scores - opponent_scores) < 1).mean() * 100  # Close enough to be a draw
         lose_pct = (player_scores < opponent_scores).mean() * 100
 
         return round(win_pct, 1), round(draw_pct, 1), round(lose_pct, 1)
 
-    # Table to display results
+    # Calculate results for deduplicated fixtures
     results = []
 
-    for _, row in gw_fixtures.iterrows():
+    for _, row in deduped_fixtures_df.iterrows():
         player = row['Player']
         opponent = row['Opponent']
 
         if player in score_distributions and opponent in score_distributions:
-            win, draw, lose = calculate_probabilities(player, opponent, score_distributions)
-            results.append([player, opponent, f"{win}%", f"{draw}%", f"{lose}%"])
+            win, draw, lose = calculate_probabilities_normal(player, opponent, score_distributions)
+            gap = abs(win - lose)
+            results.append([player, opponent, f"{win}%", f"{draw}%", f"{lose}%", gap])
         else:
-            results.append([player, opponent, "N/A", "N/A", "N/A"])
+            results.append([player, opponent, "N/A", "N/A", "N/A", 0])
 
-    results_df = pd.DataFrame(results, columns=["Player", "Opponent", "Win %", "Draw %", "Lose %"])
-    st.dataframe(results_df, use_container_width=True)
+    # Rank results by 'gap' score
+    results_df = pd.DataFrame(results, columns=["Player", "Opponent", "Win %", "Draw %", "Lose %", "Gap"])
+    results_df = results_df.sort_values(by="Gap", ascending=False).reset_index(drop=True)
+
+    # Display table
+    st.write("Predicted Win/Draw/Loss Probabilities (Ranked by Confidence):")
+    st.dataframe(results_df.drop(columns=["Gap"]), use_container_width=True)
 
 
 
