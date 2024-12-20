@@ -4,6 +4,7 @@ import altair as alt
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+st.experimental_singleton.clear()
 
 st.set_page_config(layout="wide")
 
