@@ -559,12 +559,9 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     # Calculate correlation matrix
     correlation_matrix = pivoted_scores.corr()
 
-    # Extract pairs of correlations without using reset_index
-    corr_pairs = (
-        correlation_matrix.where(np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool))
-        .stack()
-        .reset_index()
-    )
+    # Extract the upper triangle of the correlation matrix as pairs
+    corr_pairs = correlation_matrix.where(np.triu(np.ones(correlation_matrix.shape), k=1))
+    corr_pairs = corr_pairs.stack().reset_index()
     corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename columns for clarity
 
     # Get top 5 most similar and least similar pairs
