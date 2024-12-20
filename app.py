@@ -116,9 +116,20 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
 
         if not player_scores.empty and not opponent_scores.empty:
             total_weeks = min(len(player_scores), len(opponent_scores))
+            # Align indices to ensure comparisons work
+            player_scores = player_scores.reset_index(drop=True)
+            opponent_scores = opponent_scores.reset_index(drop=True)
+            
+            # Trim both series to the same length
+            length = min(len(player_scores), len(opponent_scores))
+            player_scores = player_scores[:length]
+            opponent_scores = opponent_scores[:length]
+            
+            # Compute weekly wins and draws
             player_weekly_wins = (player_scores > opponent_scores).sum()
             opponent_weekly_wins = (opponent_scores > player_scores).sum()
             weekly_draws = (player_scores == opponent_scores).sum()
+
 
             st.write(f"If they played every week, {player} would have won {player_weekly_wins / total_weeks:.1%} of the matches, {opponent} would have won {opponent_weekly_wins / total_weeks:.1%}, and {weekly_draws / total_weeks:.1%} would have been draws.")
 
