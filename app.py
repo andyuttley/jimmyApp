@@ -77,26 +77,31 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
     # Filter for the minimum gameweek
     gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
 
-    # Function to calculate probabilities with improved accuracy
-    def calculate_probabilities(player, opponent, score_distributions):
-        samples = 1000  # Increased sample size for better accuracy
+    # Function to calculate form-based probabilities
+    def calculate_form_probabilities(player, opponent, df, max_gameweek):
+        # Consider the last 5 gameweeks, with higher weights for more recent weeks
+        recent_gameweeks = range(max_gameweek - 4, max_gameweek + 1)
 
-        # Generate samples using existing score bags
-        player_scores = np.random.choice(score_distributions[player], samples)
-        opponent_scores = np.random.choice(score_distributions[opponent], samples)
+        player_form = df[(df['Player'] == player) & (df['Gameweek'].isin(recent_gameweeks))]
+        opponent_form = df[(df['Player'] == opponent) & (df['Gameweek'].isin(recent_gameweeks))]
 
-        # Calculate win, draw, lose probabilities
-        win_pct = (player_scores > opponent_scores).mean() * 100
-        draw_pct = (abs(player_scores - opponent_scores) < 0.1).mean() * 100  # Very small difference = draw
-        lose_pct = (player_scores < opponent_scores).mean() * 100
+        if player_form.empty or opponent_form.empty:
+            return None, None, None
 
-        # Adjust for floating-point precision to ensure total = 100%
-        total = win_pct + draw_pct + lose_pct
-        win_pct = round((win_pct / total) * 100, 1)
-        draw_pct = round((draw_pct / total) * 100, 1)
-        lose_pct = round((lose_pct / total) * 100, 1)
+        # Assign weights to recent gameweeks
+        weights = np.linspace(1, 5, num=5)  # Linearly increasing weights
 
-        return win_pct, draw_pct, lose_pct
+        # Calculate weighted average scores
+        player_weighted_score = np.average(player_form['Player_Score'].values, weights=weights)
+        opponent_weighted_score = np.average(opponent_form['Player_Score'].values, weights=weights)
+
+        # Simulate probabilities based on weighted scores
+        total = player_weighted_score + opponent_weighted_score
+        win_prob = round((player_weighted_score / total) * 100, 1)
+        lose_prob = round((opponent_weighted_score / total) * 100, 1)
+        draw_prob = round(100 - win_prob - lose_prob, 1)  # Remaining percentage for a draw
+
+        return win_prob, draw_prob, lose_prob
 
     # Display each fixture with details
     for _, row in gw_fixtures.iterrows():
@@ -157,12 +162,13 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
 
             st.altair_chart(line_chart, use_container_width=True)
 
-        # Predicted outcome
-        if player in score_distributions and opponent in score_distributions:
-            win, draw, lose = calculate_probabilities(player, opponent, score_distributions)
-            st.write(f"Predicted outcome: {player} has a {win}% chance to win, {draw}% chance to draw, and {lose}% chance to lose.")
+        # Form-based prediction
+        win_prob, draw_prob, lose_prob = calculate_form_probabilities(player, opponent, df, max_gameweek)
+        if win_prob is not None:
+            st.write(f"Form suggests: In the previous 5 gameweeks, giving increasing weight to more recent gameweeks, it would suggest that {player} has a {win_prob}% chance of winning, {draw_prob}% chance of drawing, and {lose_prob}% chance of losing.")
         else:
-            st.write("Prediction unavailable due to missing data.")
+            st.write("Form-based prediction unavailable due to insufficient data.")
+
 
 
 ##############################
