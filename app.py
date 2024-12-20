@@ -543,6 +543,59 @@ with st.expander(":chart_with_upwards_trend: Player Scoring Patterns :chart_with
     st.altair_chart(second_chart, use_container_width=True)
 
 
+##############################
+# MANAGER CORRELATION
+##############################
+
+with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upwards_trend:", expanded=False):
+    st.subheader("Analyzing Similarities in Scoring Patterns")
+    st.write(
+        "This section analyzes the scoring patterns of managers across all gameweeks. "
+        "It calculates the correlation coefficients for each pair of managers based on their scores in each gameweek. "
+        "High correlation indicates similar scoring trends, while low correlation suggests differing styles."
+    )
+
+    # Pivot data to have players as columns and gameweeks as rows
+    pivoted_scores = df.pivot_table(index='Gameweek', columns='Player', values='Player_Score', aggfunc='mean')
+
+    # Calculate correlation matrix
+    correlation_matrix = pivoted_scores.corr()
+
+    # Extract pairs of correlations explicitly
+    managers = correlation_matrix.columns
+    pairs = []
+    for i, manager1 in enumerate(managers):
+        for j, manager2 in enumerate(managers):
+            if i < j:  # Upper triangle only, no self-correlation
+                pairs.append((manager1, manager2, correlation_matrix.iloc[i, j]))
+
+    # Create DataFrame for correlations
+    corr_pairs = pd.DataFrame(pairs, columns=['Manager 1', 'Manager 2', 'Correlation'])
+
+    # Get top 5 most similar and least similar pairs
+    top_5_similar = corr_pairs.sort_values(by='Correlation', ascending=False).head(5)
+    bottom_5_similar = corr_pairs.sort_values(by='Correlation', ascending=True).head(5)
+
+    # Display top 5 most and least similar pairs
+    st.write("### Top 5 Most Similar Manager Pairs")
+    st.dataframe(top_5_similar)
+
+    st.write("### Bottom 5 Least Similar Manager Pairs")
+    st.dataframe(bottom_5_similar)
+
+    # Visualize the correlation matrix
+    st.write("### Correlation Heatmap")
+    fig, ax = plt.subplots(figsize=(10, 8))
+    cax = ax.matshow(correlation_matrix, cmap='coolwarm')
+    fig.colorbar(cax)
+    plt.xticks(range(len(correlation_matrix.columns)), correlation_matrix.columns, rotation=90)
+    plt.yticks(range(len(correlation_matrix.columns)), correlation_matrix.columns)
+    st.pyplot(fig)
+
+    # Identify the most unique manager based on average absolute correlation
+    avg_corr = correlation_matrix.abs().mean(axis=1).sort_values()
+    most_unique_manager = avg_corr.idxmin()
+    st.write(f"The most unique scoring pattern is observed with: **{most_unique_manager}**")
     
     
 
