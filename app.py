@@ -70,20 +70,8 @@ min_gameweek = fixtures['Gameweek'].min()
 with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=False):
     st.subheader(f"Fixtures for Gameweek {min_gameweek}")
 
-    # Deduplicate reverse fixtures
-    seen_fixtures = set()
-    deduped_fixtures = []
-    
     # Filter for the minimum gameweek
     gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
-    
-    for _, row in gw_fixtures.iterrows():
-        fixture = tuple(sorted([row['Player'], row['Opponent']]))
-        if fixture not in seen_fixtures:
-            seen_fixtures.add(fixture)
-            deduped_fixtures.append(row)
-    
-    deduped_fixtures_df = pd.DataFrame(deduped_fixtures)
 
     # Function to calculate probabilities with improved accuracy
     def calculate_probabilities(player, opponent, score_distributions):
@@ -106,27 +94,60 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
 
         return win_pct, draw_pct, lose_pct
 
-    # Calculate results for deduplicated fixtures
-    results = []
-
-    for _, row in deduped_fixtures_df.iterrows():
+    # Display each fixture with details
+    for _, row in gw_fixtures.iterrows():
         player = row['Player']
         opponent = row['Opponent']
 
+        st.subheader(f"{player} vs {opponent}")
+
+        # Historical head-to-head
+        history = granular_results[(granular_results['Player'] == player) & (granular_results['Opponent'] == opponent)]
+        total_matches = len(history)
+        player_wins = (history['Result'] == 'Win').sum()
+        opponent_wins = (history['Result'] == 'Lose').sum()
+        draws = (history['Result'] == 'Draw').sum()
+
+        st.write(f"They have played {total_matches} times before: {player} has won {player_wins}, {opponent} has won {opponent_wins}, and they drew {draws} times.")
+
+        # Weekly hypothetical head-to-head
+        player_scores = df[df['Player'] == player]['Player_Score']
+        opponent_scores = df[df['Player'] == opponent]['Player_Score']
+
+        if not player_scores.empty and not opponent_scores.empty:
+            total_weeks = min(len(player_scores), len(opponent_scores))
+            player_weekly_wins = (player_scores > opponent_scores).sum()
+            opponent_weekly_wins = (opponent_scores > player_scores).sum()
+            weekly_draws = (player_scores == opponent_scores).sum()
+
+            st.write(f"If they played every week, {player} would have won {player_weekly_wins / total_weeks:.1%} of the matches, {opponent} would have won {opponent_weekly_wins / total_weeks:.1%}, and {weekly_draws / total_weeks:.1%} would have been draws.")
+
+            # Line chart of scores
+            combined_scores = pd.DataFrame({
+                'Gameweek': range(1, total_weeks + 1),
+                player: player_scores[:total_weeks].values,
+                opponent: opponent_scores[:total_weeks].values
+            })
+
+            line_chart = alt.Chart(combined_scores).mark_line().encode(
+                x=alt.X('Gameweek:Q', title='Gameweek'),
+                y=alt.Y('value:Q', title='Score'),
+                color=alt.Color('variable:N', title='Player')
+            ).transform_fold(
+                [player, opponent],
+                as_=['variable', 'value']
+            ).properties(
+                width=800, height=400
+            )
+
+            st.altair_chart(line_chart, use_container_width=True)
+
+        # Predicted outcome
         if player in score_distributions and opponent in score_distributions:
             win, draw, lose = calculate_probabilities(player, opponent, score_distributions)
-            gap = abs(win - lose)
-            results.append([player, opponent, f"{win}%", f"{draw}%", f"{lose}%", gap])
+            st.write(f"Predicted outcome: {player} has a {win}% chance to win, {draw}% chance to draw, and {lose}% chance to lose.")
         else:
-            results.append([player, opponent, "N/A", "N/A", "N/A", 0])
-
-    # Rank results by 'gap' score
-    results_df = pd.DataFrame(results, columns=["Player", "Opponent", "Win %", "Draw %", "Lose %", "Gap"])
-    results_df = results_df.sort_values(by="Gap", ascending=False).reset_index(drop=True)
-
-    # Display table
-    st.write("Predicted Win/Draw/Loss Probabilities (Ranked by Confidence):")
-    st.dataframe(results_df.drop(columns=["Gap"]), use_container_width=True)
+            st.write("Prediction unavailable due to missing data.")
 
 
 
