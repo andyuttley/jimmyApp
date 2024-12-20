@@ -541,22 +541,6 @@ with st.expander(":chart_with_upwards_trend: Player Scoring Patterns :chart_with
 
     st.altair_chart(second_chart, use_container_width=True)
 
-##############################
-# MANAGER CORRELATION
-##############################
-
-# Filter to keep only unique player records (e.g., skip duplicate Player-Opponent rows)
-df_filtered = df[df['Player'] < df['Opponent']]
-
-# Perform the pivot
-pivoted_scores = df_filtered.pivot(index='Gameweek', columns='Player', values='Player_Score')
-
-# Calculate correlation matrix
-correlation_matrix = pivoted_scores.corr()
-
-# Display the correlation matrix for debugging
-print(correlation_matrix.head())
-
 
     
     
