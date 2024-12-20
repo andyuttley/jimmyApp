@@ -560,9 +560,9 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     correlation_matrix = pivoted_scores.corr()
 
     # Extract top 5 most similar and least similar pairs
-    corr_pairs = correlation_matrix.stack().reset_index()
-    corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']
-    corr_pairs = corr_pairs[corr_pairs['Manager 1'] != corr_pairs['Manager 2']]  # Remove self-correlation
+    corr_pairs = correlation_matrix.stack().reset_index(name='Correlation')
+    corr_pairs = corr_pairs[corr_pairs['level_0'] != corr_pairs['level_1']]  # Remove self-correlation
+    corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename for clarity
 
     # Sort by absolute correlation and keep unique pairs
     corr_pairs['Pair'] = corr_pairs.apply(lambda x: tuple(sorted([x['Manager 1'], x['Manager 2']])), axis=1)
@@ -592,4 +592,5 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     avg_corr = correlation_matrix.abs().mean(axis=1).sort_values()
     most_unique_manager = avg_corr.idxmin()
     st.write(f"The most unique scoring pattern is observed with: **{most_unique_manager}**")
+
 
