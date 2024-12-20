@@ -102,7 +102,7 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
         st.subheader(f"{player} vs {opponent}")
 
         # Historical head-to-head
-        history = granular_results[(granular_results['Player'] == player) & (granular_results['Opponent'] == opponent)]
+        history = df[(df['Player'] == player) & (df['Opponent'] == opponent)]
         total_matches = len(history)
         player_wins = (history['Result'] == 'Win').sum()
         opponent_wins = (history['Result'] == 'Lose').sum()
@@ -148,8 +148,6 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
             st.write(f"Predicted outcome: {player} has a {win}% chance to win, {draw}% chance to draw, and {lose}% chance to lose.")
         else:
             st.write("Prediction unavailable due to missing data.")
-
-
 
 ##############################
 # 1000 SIMULATED SEASON ENDS
