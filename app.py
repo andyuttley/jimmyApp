@@ -5,9 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-st.cache_data.clear()
-st.cache_resource.clear()
-
 
 st.set_page_config(layout="wide")
 
