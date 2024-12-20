@@ -66,6 +66,10 @@ else:
 # Get the minimum gameweek
 min_gameweek = fixtures['Gameweek'].min()
 
+# Filter out duplicate fixtures (e.g., Tim vs Mikey and Mikey vs Tim)
+fixtures['Pair'] = fixtures.apply(lambda x: tuple(sorted([x['Player'], x['Opponent']])), axis=1)
+fixtures = fixtures.drop_duplicates(subset=['Pair'])
+
 # PREVIEW GAMEWEEK X
 with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=False):
     st.subheader(f"Fixtures for Gameweek {min_gameweek}")
@@ -159,6 +163,7 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
             st.write(f"Predicted outcome: {player} has a {win}% chance to win, {draw}% chance to draw, and {lose}% chance to lose.")
         else:
             st.write("Prediction unavailable due to missing data.")
+
 
 ##############################
 # 1000 SIMULATED SEASON ENDS
