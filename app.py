@@ -151,9 +151,6 @@ with st.expander(":robot_face: Simulating 1000 seasons... :robot_face:", expande
     else:
         st.write("Not enough players to form top 4 playoff matches.")
 
-    # Show finishing_positions table
-    st.write("Finishing Positions (Percent Chance at Each Rank):")
-    st.dataframe(finishing_positions)
 
     # Show the full top_4_odds table
     st.write("Full Top 4 Odds:")
@@ -178,6 +175,11 @@ with st.expander(":robot_face: Simulating 1000 seasons... :robot_face:", expande
     else:
         st.write("No historical top_4_odds data available yet.")
 
+    # Show finishing_positions table
+    st.write("Finishing Positions (Percent Chance at Each Rank):")
+    st.dataframe(finishing_positions)
+    
+    
     # Create a single distribution chart (lines) of each player's 'bag' of scores
     scores_list = []
     for player, arr in score_distributions.items():
