@@ -74,8 +74,9 @@ fixtures = fixtures.drop_duplicates(subset=['Pair'])
 with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expanded=False):
     st.subheader(f"Fixtures for Gameweek {min_gameweek}")
 
-    # Filter for the minimum gameweek
-    gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
+    # Summary section
+    st.markdown("### Summary")
+    summary_lines = []
 
     # Function to calculate form-based probabilities
     def calculate_form_probabilities(player, opponent, df, max_gameweek):
@@ -102,6 +103,23 @@ with st.expander(f":calendar: Preview Gameweek {min_gameweek} :calendar:", expan
         draw_prob = round(100 - win_prob - lose_prob, 1)  # Remaining percentage for a draw
 
         return win_prob, draw_prob, lose_prob
+
+    # Filter for the minimum gameweek
+    gw_fixtures = fixtures[fixtures['Gameweek'] == min_gameweek]
+
+    for _, row in gw_fixtures.iterrows():
+        player = row['Player']
+        opponent = row['Opponent']
+
+        # Form-based prediction
+        win_prob, draw_prob, lose_prob = calculate_form_probabilities(player, opponent, df, max_gameweek)
+        if win_prob is not None:
+            predicted_winner = player if win_prob > lose_prob else opponent
+            summary_lines.append(f"- {player} vs {opponent}: Predicted winner is {predicted_winner}")
+        else:
+            summary_lines.append(f"- {player} vs {opponent}: Insufficient data for prediction")
+
+    st.markdown("\n".join(summary_lines))
 
     # Display each fixture with details
     for _, row in gw_fixtures.iterrows():
