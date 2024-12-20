@@ -550,7 +550,7 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     st.write(
         "This section analyzes the scoring patterns of managers across all gameweeks. "
         "It calculates the correlation coefficients for each pair of managers based on their scores in each gameweek. "
-        "High correlation indicates similar scoring trends, while low correlation suggests differing styles (e.g. different underlying teams favoured."
+        "High correlation indicates similar scoring trends, while low correlation suggests differing styles."
     )
 
     # Pivot data to have players as columns and gameweeks as rows
@@ -560,8 +560,8 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     correlation_matrix = pivoted_scores.corr()
 
     # Extract top 5 most similar and least similar pairs
-    corr_pairs = correlation_matrix.unstack().reset_index()
-    corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename columns to avoid conflicts
+    corr_pairs = correlation_matrix.stack().reset_index()
+    corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']
     corr_pairs = corr_pairs[corr_pairs['Manager 1'] != corr_pairs['Manager 2']]  # Remove self-correlation
 
     # Sort by absolute correlation and keep unique pairs
@@ -592,5 +592,4 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     avg_corr = correlation_matrix.abs().mean(axis=1).sort_values()
     most_unique_manager = avg_corr.idxmin()
     st.write(f"The most unique scoring pattern is observed with: **{most_unique_manager}**")
-
 
