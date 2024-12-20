@@ -559,16 +559,13 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     # Calculate correlation matrix
     correlation_matrix = pivoted_scores.corr()
 
-    # Reset index and unstack correlations into pairs, avoiding duplicate columns
-    corr_pairs = correlation_matrix.stack().reset_index()
+    # Extract pairs of correlations without using reset_index
+    corr_pairs = (
+        correlation_matrix.where(np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool))
+        .stack()
+        .reset_index()
+    )
     corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename columns for clarity
-
-    # Filter out self-correlations
-    corr_pairs = corr_pairs[corr_pairs['Manager 1'] != corr_pairs['Manager 2']]
-
-    # Sort by absolute correlation and keep unique pairs
-    corr_pairs['Pair'] = corr_pairs.apply(lambda x: tuple(sorted([x['Manager 1'], x['Manager 2']])), axis=1)
-    corr_pairs = corr_pairs.drop_duplicates(subset='Pair')
 
     # Get top 5 most similar and least similar pairs
     top_5_similar = corr_pairs.sort_values(by='Correlation', ascending=False).head(5)
