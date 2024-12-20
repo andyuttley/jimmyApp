@@ -556,9 +556,6 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     # Pivot data to have players as columns and gameweeks as rows
     pivoted_scores = df.pivot(index='Gameweek', columns='Player', values='Player_Score')
 
-    # Calculate correlation matrix
-    correlation_matrix = pivoted_scores.corr()
-
     
     
 
