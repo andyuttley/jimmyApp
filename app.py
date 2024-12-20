@@ -559,10 +559,6 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     # Calculate correlation matrix
     correlation_matrix = pivoted_scores.corr()
 
-    # Extract pairs of correlations using a boolean mask
-    mask = np.triu(np.ones(correlation_matrix.shape), k=1).astype(bool)
-    corr_pairs = correlation_matrix.where(mask).stack().reset_index()
-    corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename columns for clarity
-
+    
     
 
