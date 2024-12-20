@@ -547,7 +547,7 @@ with st.expander(":chart_with_upwards_trend: Player Scoring Patterns :chart_with
 # MANAGER CORRELATION
 ##############################
 
-with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upwards_trend:", expanded=False):
+with st.expander(":handshake: Manager Correlation :handshake:", expanded=False):
     st.subheader("Analyzing Similarities in Scoring Patterns")
     st.write(
         "This section analyzes the scoring patterns of managers across all gameweeks. "
@@ -577,10 +577,10 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     bottom_5_similar = corr_pairs.sort_values(by='Correlation', ascending=True).head(5)
 
     # Display top 5 most and least similar pairs
-    st.write("### Top 5 Most Similar Manager Pairs")
+    st.write("### 5 Most Similar Manager Pairs")
     st.dataframe(top_5_similar)
 
-    st.write("### Bottom 5 Least Similar Manager Pairs")
+    st.write("### 5 Least Similar Manager Pairs")
     st.dataframe(bottom_5_similar)
 
     # Visualize the correlation matrix
