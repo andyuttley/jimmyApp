@@ -545,16 +545,18 @@ with st.expander(":chart_with_upwards_trend: Player Scoring Patterns :chart_with
 # MANAGER CORRELATION
 ##############################
 
-with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upwards_trend:", expanded=False):
-    st.subheader("Analyzing Similarities in Scoring Patterns")
-    st.write(
-        "This section analyzes the scoring patterns of managers across all gameweeks. "
-        "It calculates the correlation coefficients for each pair of managers based on their scores in each gameweek. "
-        "High correlation indicates similar scoring trends, while low correlation suggests differing styles."
-    )
+# Filter to keep only unique player records (e.g., skip duplicate Player-Opponent rows)
+df_filtered = df[df['Player'] < df['Opponent']]
 
-    # Pivot data to have players as columns and gameweeks as rows
-    pivoted_scores = df.pivot(index='Gameweek', columns='Player', values='Player_Score')
+# Perform the pivot
+pivoted_scores = df_filtered.pivot(index='Gameweek', columns='Player', values='Player_Score')
+
+# Calculate correlation matrix
+correlation_matrix = pivoted_scores.corr()
+
+# Display the correlation matrix for debugging
+print(correlation_matrix.head())
+
 
     
     
