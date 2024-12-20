@@ -564,28 +564,5 @@ with st.expander(":chart_with_upwards_trend: Manager Correlation :chart_with_upw
     corr_pairs = correlation_matrix.where(mask).stack().reset_index()
     corr_pairs.columns = ['Manager 1', 'Manager 2', 'Correlation']  # Rename columns for clarity
 
-    # Get top 5 most similar and least similar pairs
-    top_5_similar = corr_pairs.sort_values(by='Correlation', ascending=False).head(5)
-    bottom_5_similar = corr_pairs.sort_values(by='Correlation', ascending=True).head(5)
-
-    # Display top 5 most and least similar pairs
-    st.write("### Top 5 Most Similar Manager Pairs")
-    st.dataframe(top_5_similar)
-
-    st.write("### Bottom 5 Least Similar Manager Pairs")
-    st.dataframe(bottom_5_similar)
-
-    # Visualize the correlation matrix
-    st.write("### Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(10, 8))
-    cax = ax.matshow(correlation_matrix, cmap='coolwarm')
-    fig.colorbar(cax)
-    plt.xticks(range(len(correlation_matrix.columns)), correlation_matrix.columns, rotation=90)
-    plt.yticks(range(len(correlation_matrix.columns)), correlation_matrix.columns)
-    st.pyplot(fig)
-
-    # Identify the most unique manager based on average absolute correlation
-    avg_corr = correlation_matrix.abs().mean(axis=1).sort_values()
-    most_unique_manager = avg_corr.idxmin()
-    st.write(f"The most unique scoring pattern is observed with: **{most_unique_manager}**")
+    
 
