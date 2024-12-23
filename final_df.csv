@@ -159,3 +159,13 @@ Sam,Andy,25,39,Lose,0,16,9.0,0
 Andy,Sam,39,25,Win,3,16,4.0,3
 Dove,Mike,53,19,Win,3,16,1.0,3
 Mike,Dove,19,53,Lose,0,16,10.0,0
+Nick,John,64,16,Win,3,17,2.0,3
+John,Nick,16,64,Lose,0,17,10.0,0
+Karl,Mikey,44,93,Lose,0,17,7.0,0
+Mikey,Karl,93,44,Win,3,17,1.0,3
+Tim,Andy,55,46,Win,3,17,4.0,3
+Andy,Tim,46,55,Lose,0,17,6.0,1
+Matt,Mike,36,51,Lose,0,17,8.0,0
+Mike,Matt,51,36,Win,3,17,5.0,1
+Sam,Dove,61,33,Win,3,17,3.0,3
+Dove,Sam,33,61,Lose,0,17,9.0,0
