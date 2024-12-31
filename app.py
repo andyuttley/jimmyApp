@@ -596,6 +596,51 @@ with st.expander(":handshake: Manager Correlation :handshake:", expanded=False):
     avg_corr = correlation_matrix.abs().mean(axis=1).sort_values()
     most_unique_manager = avg_corr.idxmin()
     st.write(f"The most unique scoring pattern is observed with: **{most_unique_manager}**")
-    
-    
+
+with st.expander("Can they still make playoffs?", expanded=False):
+    st.subheader("Playoff Eligibility Check")
+
+    def calculate_playoff_eligibility(fixtures, aggregated_table, remaining_gameweeks, points_for_win, points_for_draw):
+        """
+        Determine playoff eligibility based on remaining fixtures.
+        """
+        # Current 4th place points as the threshold
+        fourth_place_points = aggregated_table.iloc[3]['Table Points']
+
+        playoff_status = []
+
+        # Simulate remaining fixtures for each player
+        for player in aggregated_table['Player']:
+            current_points = aggregated_table[aggregated_table['Player'] == player]['Table Points'].values[0]
+            
+            # Get remaining fixtures for the player
+            player_fixtures = fixtures[(fixtures['Player'] == player) | (fixtures['Opponent'] == player)]
+            
+            max_possible_points = current_points
+            
+            for _, row in player_fixtures.iterrows():
+                if row['Player'] == player:
+                    # This player is playing
+                    max_possible_points += max(points_for_win, points_for_draw)
+                else:
+                    # This player is the opponent
+                    max_possible_points += max(points_for_win, points_for_draw)
+
+            # Determine eligibility
+            can_make_playoffs = max_possible_points >= fourth_place_points
+            playoff_status.append((player, "✅" if can_make_playoffs else "❌"))
+
+        return playoff_status
+
+    # Constants
+    POINTS_FOR_WIN = 3
+    POINTS_FOR_DRAW = 1
+
+    # Calculate playoff eligibility
+    playoff_status = calculate_playoff_eligibility(fixtures, aggregated_table, remaining_gameweeks, POINTS_FOR_WIN, POINTS_FOR_DRAW)
+
+    # Display results
+    playoff_df = pd.DataFrame(playoff_status, columns=["Player", "Playoff Eligibility"])
+    st.dataframe(playoff_df)
+
 
