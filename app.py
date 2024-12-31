@@ -344,6 +344,13 @@ with st.expander("🍀 What's LUCK got to do with it? 🍀", expanded=False):
     # Show the matrix
     st.dataframe(rank_matrix, use_container_width=True)
 
+    # Calculate Opponent GW Rank
+    df = df.merge(
+        df[['Player', 'Gameweek', 'GW Rank']].rename(columns={'Player': 'Opponent', 'GW Rank': 'Opponent GW Rank'}),
+        on=['Opponent', 'Gameweek'],
+        how='left'
+    )
+    
     # Create the matrix: rows are players, columns are their opponents' GW ranks, values are counts
     opponent_rank_matrix = df.pivot_table(
         index='Player', 
@@ -353,10 +360,14 @@ with st.expander("🍀 What's LUCK got to do with it? 🍀", expanded=False):
     )
     
     # Rename columns for clarity (e.g., 1 -> 1st, 2 -> 2nd, etc.)
-    opponent_rank_matrix.columns = [f"{int(col)}{('th' if 4 <= col <= 20 else {1:'st',2:'nd',3:'rd'}.get(col % 10, 'th'))}" for col in opponent_rank_matrix.columns]
+    opponent_rank_matrix.columns = [
+        f"{int(col)}{('th' if 4 <= col <= 20 else {1:'st', 2:'nd', 3:'rd'}.get(col % 10, 'th'))}" for col in opponent_rank_matrix.columns
+    ]
     
     # Show the matrix
+    st.write("Matrix of the count each time each player's OPPONENT has finished in that rank for the gameweek")
     st.dataframe(opponent_rank_matrix, use_container_width=True)
+
 
 
 
