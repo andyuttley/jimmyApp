@@ -179,3 +179,13 @@ Tim,Dove,41,49,Lose,0,18,4.0,3
 Dove,Tim,49,41,Win,3,18,2.0,3
 Matt,Sam,55,44,Win,3,18,1.0,3
 Sam,Matt,44,55,Lose,0,18,3.0,3
+Matt,Sam,30,36,Lose,0,19,8.0,0
+Sam,Matt,36,30,Win,3,19,7.0,0
+Tim,Nick,52,52,Draw,1,19,4.0,3
+Nick,Tim,52,52,Draw,1,19,4.0,3
+Karl,Mikey,48,60,Lose,0,19,6.0,1
+Mikey,Karl,60,48,Win,3,19,2.0,3
+Andy,John,73,20,Win,3,19,1.0,3
+John,Andy,20,73,Lose,0,19,10.0,0
+Mike,Dove,60,27,Win,3,19,2.0,3
+Dove,Mike,27,60,Lose,0,19,9.0,0
