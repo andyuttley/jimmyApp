@@ -239,3 +239,13 @@ Mikey,Tim,41,40,Win,3,24,7.0,0
 Tim,Mikey,40,41,Lose,0,24,8.0,0
 Nick,Sam,78,76,Win,3,24,2.0,3
 Sam,Nick,76,78,Lose,0,24,3.0,3
+Matt,Andy,49,49,Draw,1,25,3.0,3
+Andy,Matt,49,49,Draw,1,25,3.0,3
+Mike,Karl,46,44,Win,3,25,6.0,1
+Karl,Mike,44,46,Lose,0,25,7.0,0
+Dove,Tim,44,22,Win,3,25,7.0,0
+Tim,Dove,22,44,Lose,0,25,10.0,0
+John,Sam,56,48,Win,3,25,2.0,3
+Sam,John,48,56,Lose,0,25,5.0,1
+Mikey,Nick,71,36,Win,3,25,1.0,3
+Nick,Mikey,36,71,Lose,0,25,9.0,0
