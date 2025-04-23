@@ -309,3 +309,13 @@ Nick,Dove,41,29,Win,3,31,3.0,3
 Dove,Nick,29,41,Lose,0,31,7.0,0
 Matt,Andy,41,51,Lose,0,31,3.0,3
 Andy,Matt,51,41,Win,3,31,2.0,3
+John,Karl,39,44,Lose,0,32,7.0,0
+Karl,John,44,39,Win,3,32,6.0,1
+Mikey,Mike,91,64,Win,3,32,1.0,3
+Mike,Mikey,64,91,Lose,0,32,2.0,3
+Tim,Dove,53,30,Win,3,32,4.0,3
+Dove,Tim,30,53,Lose,0,32,10.0,0
+Sam,Andy,60,49,Win,3,32,3.0,3
+Andy,Sam,49,60,Lose,0,32,5.0,1
+Nick,Matt,39,39,Draw,1,32,7.0,0
+Matt,Nick,39,39,Draw,1,32,7.0,0
