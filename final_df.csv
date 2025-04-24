@@ -319,3 +319,13 @@ Sam,Andy,60,49,Win,3,32,3.0,3
 Andy,Sam,49,60,Lose,0,32,5.0,1
 Nick,Matt,39,39,Draw,1,32,7.0,0
 Matt,Nick,39,39,Draw,1,32,7.0,0
+John,Mike,25,68,Lose,0,33,10.0,0
+Mike,John,68,25,Win,3,33,2.0,3
+Karl,Dove,55,48,Win,3,33,5.0,1
+Dove,Karl,48,55,Lose,0,33,7.0,0
+Mikey,Andy,59,66,Lose,0,33,4.0,3
+Andy,Mikey,66,59,Win,3,33,3.0,3
+Tim,Matt,41,84,Lose,0,33,8.0,0
+Matt,Tim,84,41,Win,3,33,1.0,3
+Sam,Nick,32,50,Lose,0,33,9.0,0
+Nick,Sam,50,32,Win,3,33,6.0,1
