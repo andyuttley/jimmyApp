@@ -374,7 +374,7 @@ with st.expander("🍀 What's LUCK got to do with it? 🍀", expanded=False):
 ###############
 # SEASON AWARDS
 ###############
-with st.expander(":sports_medal: Season Awards :sports_medal:", expanded=False):
+with st.expander("🏅 Season Awards 🏅", expanded=False):
     st.subheader("Season Awards")
 
     luck_stats = aggregated_table.copy()
@@ -482,7 +482,7 @@ with st.expander(":sports_medal: Season Awards :sports_medal:", expanded=False):
 #########################
 # PLAYER VS PLAYER COMPARISON
 #########################
-with st.expander(":people_holding_hands: Player vs Player Comparison :people_holding_hands:", expanded=False):
+with st.expander("👬 Player vs Player Comparison 👬", expanded=False):
     st.subheader("Player vs Player Comparison")
     st.write("See how you compare to another player, if you'd head-to-head played them each week.")
 
