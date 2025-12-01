@@ -682,9 +682,6 @@ with st.expander("Can they still make playoffs?", expanded=False):
 ##############################
 # MANAGER FORM
 ##############################
-##############################
-# MANAGER FORM
-##############################
 with st.expander(":clipboard: Manager Form :clipboard:", expanded=False):
     st.subheader("Manager Form Guide")
     st.write("A visual tracking of results across the season sorted by league position.")
@@ -737,7 +734,25 @@ with st.expander(":clipboard: Manager Form :clipboard:", expanded=False):
     def make_pretty(val):
         if val == 'Win':
             return '🟩' 
-        elif val
+        elif val == 'Lose':
+            return '🟥'
+        elif val == 'Draw':
+            return '⬜'
+        return val
+
+    # Apply the pretty symbols to the specific Gameweek columns only
+    # (We exclude 'Current Form' from this replacement so it stays as text)
+    gw_cols = [c for c in form_pivot.columns if c != 'Current Form']
+    form_pivot[gw_cols] = form_pivot[gw_cols].applymap(make_pretty)
+
+    # 7. Display
+    # increasing height to ensure all rows are visible
+    st.dataframe(
+        form_pivot, 
+        use_container_width=True, 
+        height=(len(form_pivot) * 35) + 40 
+    )
+
 
 
 ##############################
