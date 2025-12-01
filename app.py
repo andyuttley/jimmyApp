@@ -4,6 +4,8 @@ import altair as alt
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from scipy.stats import norm
+import math
 
 
 st.set_page_config(layout="wide")
@@ -677,4 +679,135 @@ with st.expander("Can they still make playoffs?", expanded=False):
     st.dataframe(playoff_df)
 
 
+##############################
+# MANAGER FORM
+##############################
+with st.expander(":clipboard: Manager Form :clipboard:", expanded=False):
+    st.subheader("Manager Form Guide")
+    st.write("A view of results across the season. Green indicates a Win, Red a Loss, and Grey a Draw. The 'Current Form' column summarizes the current streak (e.g., '3W' means the manager has won their last 3 consecutive games).")
 
+    # 1. Prepare the data
+    # Filter only necessary columns and ensure gameweeks are sorted
+    form_data = df[['Player', 'Gameweek', 'Result']].sort_values(by='Gameweek')
+
+    # 2. Pivot the data to get Gameweeks as columns
+    form_pivot = form_data.pivot(index='Player', columns='Gameweek', values='Result')
+
+    # 3. Calculate 'Current Form' string (e.g., 3W, 2L)
+    def calculate_streak(row):
+        # Get valid results for the player (ignore NaNs if any)
+        results = row.dropna().values
+        if len(results) == 0:
+            return "-"
+        
+        last_result = results[-1]
+        streak = 0
+        
+        # Iterate backwards to count the streak
+        for res in reversed(results):
+            if res == last_result:
+                streak += 1
+            else:
+                break
+        
+        # Abbreviate: Win->W, Lose->L, Draw->D
+        abbrev = last_result[0] 
+        return f"{streak}{abbrev}"
+
+    # Apply the streak function row-wise
+    form_pivot['Current Form'] = form_pivot.apply(calculate_streak, axis=1)
+
+    # 4. Define Styling Function
+    def color_results(val):
+        if not isinstance(val, str):
+            return ''
+        
+        color = 'white' # Default
+        if val == 'Win':
+            color = '#90ee90' # Light Green
+        elif val == 'Lose':
+            color = '#ffcccb' # Light Red
+        elif val == 'Draw':
+            color = '#d3d3d3' # Grey
+        
+        # Don't color the 'Current Form' column background, just the results
+        if len(val) <= 3 and val not in ['Win', 'Lose', 'Draw']: 
+             return ''
+             
+        return f'background-color: {color}; color: black; border: 1px solid white'
+
+    # 5. Apply style and display
+    # We apply the color map to the dataframe
+    styled_form = form_pivot.style.map(color_results)
+    
+    st.dataframe(styled_form, use_container_width=True)
+
+
+##############################
+# PLAYOFF POINTS ESTIMATOR
+##############################
+with st.expander(":chart_with_upwards_trend: Playoff Points Estimator :chart_with_upwards_trend:", expanded=False):
+    st.subheader("4th Place Target Analysis")
+    st.write("This chart analyzes historical data to estimate the points required to secure 4th place (the playoff cutoff). It uses a Normal Distribution (Bell Curve) to determine the most likely point threshold needed to qualify.")
+
+    # 1. Filter Data for 4th Place
+    # Ensure column names match your CSV. Using 'Rank' and 'Table Points' based on your prompt.
+    rank_col = 'Rank'
+    points_col = 'Table Points'
+
+    # Filter for Rank 4
+    filtered_df = granular_results[granular_results[rank_col] == 4]
+    
+    if not filtered_df.empty:
+        points = filtered_df[points_col]
+
+        # 2. Calculate Statistics
+        mean_val = points.mean()
+        # Round Mean UP to the nearest whole number for the "Target"
+        target_points = math.ceil(mean_val)
+        min_val = points.min()
+        max_val = points.max()
+        std_val = points.std()
+
+        st.write(f"Based on historical data, the **Average** points needed for 4th place is **{mean_val:.2f}**. Therefore, the safe target to aim for is **{target_points}** points.")
+        st.write(f"The lowest 4th place score recorded was **{min_val}**, and the highest was **{max_val}**.")
+
+        # 3. Plotting
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        # Plot Histogram (Observed Data)
+        # Using specific bins to ensure integer steps are respected and it looks smoother
+        bins = np.arange(min_val, max_val + 2) - 0.5
+        ax.hist(points, bins=bins, density=True, alpha=0.6, color='#87CEEB', edgecolor='white', label='Historical Frequency')
+
+        # Plot Bell Curve (Probability Density Function)
+        xmin, xmax = ax.get_xlim()
+        x = np.linspace(xmin, xmax, 100)
+        p = norm.pdf(x, mean_val, std_val)
+        ax.plot(x, p, 'r', linewidth=2.5, label='Normal Distribution')
+
+        # Add Vertical Lines for Min, Max, and Mean (Target)
+        ax.axvline(mean_val, color='green', linestyle='dashed', linewidth=2, label=f'Mean (Target): {target_points}')
+        ax.axvline(min_val, color='blue', linestyle='dotted', linewidth=2, label=f'Min: {min_val}')
+        ax.axvline(max_val, color='orange', linestyle='dotted', linewidth=2, label=f'Max: {max_val}')
+
+        # Add Annotations (Text on chart)
+        y_max = p.max()
+        ax.text(mean_val, y_max * 1.05, f'Target: {target_points}', color='green', ha='center', fontweight='bold')
+        ax.text(min_val, y_max * 0.5, f' Min: {min_val}', color='blue', ha='left')
+        ax.text(max_val, y_max * 0.5, f' Max: {max_val}', color='orange', ha='right')
+
+        # Styling the chart
+        ax.set_title('Distribution of Points Required for 4th Place', fontsize=16)
+        ax.set_xlabel('Table Points', fontsize=12)
+        ax.set_ylabel('Probability Density', fontsize=12)
+        ax.legend(loc='upper right')
+        ax.grid(axis='y', alpha=0.3)
+        
+        # Remove top and right spines for cleaner look
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+        st.pyplot(fig)
+    else:
+        st.warning("No data available for Rank 4 in 'granular_results.csv'. Please check the file.")
