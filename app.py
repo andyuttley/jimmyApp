@@ -682,20 +682,29 @@ with st.expander("Can they still make playoffs?", expanded=False):
 ##############################
 # MANAGER FORM
 ##############################
+##############################
+# MANAGER FORM
+##############################
 with st.expander(":clipboard: Manager Form :clipboard:", expanded=False):
     st.subheader("Manager Form Guide")
-    st.write("A view of results across the season. Green indicates a Win, Red a Loss, and Grey a Draw. The 'Current Form' column summarizes the current streak (e.g., '3W' means the manager has won their last 3 consecutive games).")
+    st.write("A visual tracking of results across the season sorted by league position.")
 
-    # 1. Prepare the data
-    # Filter only necessary columns and ensure gameweeks are sorted
-    form_data = df[['Player', 'Gameweek', 'Result']].sort_values(by='Gameweek')
+    # 1. Determine Rank Order based on Total Table Points
+    # We sum points, sort descending, and get the list of players in order
+    rank_order = df.groupby('Player')['Table Points'].sum().sort_values(ascending=False).index.tolist()
 
-    # 2. Pivot the data to get Gameweeks as columns
+    # 2. Prepare the data
+    form_data = df[['Player', 'Gameweek', 'Result']].copy()
+
+    # 3. Pivot: Players as Index, Gameweeks as Columns
     form_pivot = form_data.pivot(index='Player', columns='Gameweek', values='Result')
 
-    # 3. Calculate 'Current Form' string (e.g., 3W, 2L)
-    def calculate_streak(row):
-        # Get valid results for the player (ignore NaNs if any)
+    # 4. Reorder rows based on the Rank we calculated
+    form_pivot = form_pivot.reindex(rank_order)
+
+    # 5. Calculate 'Current Form' with a bit of logic for "Heat"
+    def calculate_form_string(row):
+        # Drop NaNs (future weeks)
         results = row.dropna().values
         if len(results) == 0:
             return "-"
@@ -703,44 +712,32 @@ with st.expander(":clipboard: Manager Form :clipboard:", expanded=False):
         last_result = results[-1]
         streak = 0
         
-        # Iterate backwards to count the streak
+        # Count backwards
         for res in reversed(results):
             if res == last_result:
                 streak += 1
             else:
                 break
         
-        # Abbreviate: Win->W, Lose->L, Draw->D
-        abbrev = last_result[0] 
-        return f"{streak}{abbrev}"
-
-    # Apply the streak function row-wise
-    form_pivot['Current Form'] = form_pivot.apply(calculate_streak, axis=1)
-
-    # 4. Define Styling Function
-    def color_results(val):
-        if not isinstance(val, str):
-            return ''
+        # Formatting: 3W, 1L, etc.
+        abbrev = last_result[0] # 'W', 'L', 'D'
+        form_str = f"{streak}{abbrev}"
         
-        color = 'white' # Default
+        # Add Fire emoji if they have won 3 or more in a row!
+        if last_result == 'Win' and streak >= 3:
+            form_str += " 🔥"
+            
+        return form_str
+
+    # Create the Form column
+    form_pivot['Current Form'] = form_pivot.apply(calculate_form_string, axis=1)
+
+    # 6. Make it COOL: Replace text with visual blocks
+    # We replace the raw "Win/Lose" text with solid colored squares for a "Ticker" look
+    def make_pretty(val):
         if val == 'Win':
-            color = '#90ee90' # Light Green
-        elif val == 'Lose':
-            color = '#ffcccb' # Light Red
-        elif val == 'Draw':
-            color = '#d3d3d3' # Grey
-        
-        # Don't color the 'Current Form' column background, just the results
-        if len(val) <= 3 and val not in ['Win', 'Lose', 'Draw']: 
-             return ''
-             
-        return f'background-color: {color}; color: black; border: 1px solid white'
-
-    # 5. Apply style and display
-    # We apply the color map to the dataframe
-    styled_form = form_pivot.style.map(color_results)
-    
-    st.dataframe(styled_form, use_container_width=True)
+            return '🟩' 
+        elif val
 
 
 ##############################
